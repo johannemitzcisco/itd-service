@@ -1,0 +1,9 @@
+<intelligent_traffic_director xmlns="http://com/example/intelligenttrafficdirector">
+  <itd-service>{$SERVICE-NAME}</itd-service>
+  <device>{$DEVICE-NAME}</device>
+  <node-ip>{$NODE-IP}</node-ip>
+  <ingress-interface>{$INGRESS-INTERFACE-NAME}</ingress-interface>
+  <virtual-ip>{$SERVICE-IP-ADDRESS}</virtual-ip>
+  <virtual-ip-mask>{$SERVICE-IP-MASK}</virtual-ip-mask>
+  <buckets>{$SERVICE-BUCKET-COUNT}</buckets>
+</intelligent_traffic_director>

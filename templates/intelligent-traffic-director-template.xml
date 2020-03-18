@@ -1,0 +1,46 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0"
+                 servicepoint="intelligent-traffic-director">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+    <device>
+    <name>{/device}</name>
+      <config>
+        <feature xmlns="http://tail-f.com/ned/cisco-nx">
+          <itd/>
+        </feature>
+        <itd xmlns="http://tail-f.com/ned/cisco-nx">
+          <device-group>
+            <group-name>{/itd-service}</group-name>
+            <node>
+              <ip>
+                <address>{/node-ip}</address>
+              </ip>
+            </node>
+          </device-group>
+          <service>
+            <name>{/itd-service}</name>
+            <device-group>{/itd-service}</device-group>
+            <ingress>
+              <interface>
+                <name>{/ingress-interface}</name>
+              </interface>
+            </ingress>
+            <load-balance>
+              <method>
+                <method>src</method>
+                <ip/>
+              </method>
+              <buckets>{/buckets}</buckets>
+            </load-balance>
+            <virtual>
+              <ip>
+                <address>{/virtual-ip}</address>
+                <mask>{/virtual-ip-mask}</mask>
+                <advertise>enable</advertise>
+              </ip>
+            </virtual>
+          </service>
+        </itd>
+      </config>
+    </device>
+  </devices>
+</config-template>

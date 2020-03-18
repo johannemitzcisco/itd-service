@@ -1,0 +1,57 @@
+module intelligent-traffic-director {
+  namespace "http://com/example/intelligenttrafficdirector";
+  prefix itd;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  grouping itd-common-grouping {
+    leaf buckets {
+      type uint16 {
+          range 2..256;
+      }
+    }
+  }
+  grouping itd-side-grouping {
+    leaf ingress-interface {
+      type string;
+    }
+
+    leaf virtual-ip {
+      type inet:ipv4-address;
+    }
+
+    leaf virtual-ip-mask {
+       type string;
+    }
+  }
+
+  list intelligent_traffic_director {
+    key itd-service;
+
+    uses ncs:service-data;
+    ncs:servicepoint "intelligent-traffic-director";
+
+    leaf itd-service {
+      type string;
+    }
+    
+    leaf device {
+      type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+      }
+    }
+
+    leaf-list node-ip {
+      type string;
+    }
+
+    uses itd-common-grouping;
+    uses itd-side-grouping;
+    
+  }
+}

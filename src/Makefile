@@ -4,25 +4,20 @@ all: fxs
 # Include standard NCS examples build definitions and rules
 include $(NCS_DIR)/src/ncs/build/include.ncs.mk
 
-SRC = $(wildcard yang/*.yang)
-DIRS = ../load-dir java/src/$(JDIR)/$(NS)
+SRC  = $(wildcard yang/*.yang)
+DIRS = ../load-dir
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 
 ## Uncomment and patch the line below if you have a dependency to a NED
 ## or to other YANG files
-YANGPATH += ../../tailf-etsi-rel2-nfvo/src/yang 
+# YANGPATH += ../../<ned-name>/src/ncsc-out/modules/yang \
 # 	../../<pkt-name>/src/yang
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)
-PYTHONSRC = $(wildcard ../python/ftdv_ngfw/*.py)
-TEMPLATESRC = $(wildcard loaddata/*.xml)
 
-fxs: $(PYTHONSRC) $(DIRS) $(FXS) $(TEMPLATESRC)
-
-$(PYTHONSRC): .FORCE
-	python -m py_compile $@
-.PHONY: .FORCE
+fxs: $(DIRS) $(FXS)
+.PHONY: fxs
 
 $(DIRS):
 	mkdir -p $@
@@ -30,10 +25,6 @@ $(DIRS):
 ../load-dir/%.fxs: yang/%.yang
 	$(NCSC)  `ls $*-ann.yang  > /dev/null 2>&1 && echo "-a $*-ann.yang"` \
              $(NCSCPATH) -c -o $@ $<
-
-$(TEMPLATESRC): .FORCE
-	cp $@ ../load-dir
-
 clean:
 	rm -rf $(DIRS)
 .PHONY: clean
