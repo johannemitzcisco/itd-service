@@ -2,26 +2,26 @@
                  servicepoint="intelligent-traffic-director">
   <devices xmlns="http://tail-f.com/ns/ncs">
     <device>
-    <name>{/device}</name>
+    <name>{/sides/devices}</name>
       <config>
         <feature xmlns="http://tail-f.com/ned/cisco-nx">
           <itd/>
         </feature>
         <itd xmlns="http://tail-f.com/ned/cisco-nx">
           <device-group>
-            <group-name>{/itd-service}</group-name>
+            <group-name>{string(../../service-name)}</group-name>
             <node>
               <ip>
-                <address>{/node-ip}</address>
+                <address>{../node-ip}</address>
               </ip>
             </node>
           </device-group>
           <service>
-            <name>{/itd-service}</name>
-            <device-group>{/itd-service}</device-group>
+            <name>{string(../../service-name)}</name>
+            <device-group>{string(../../service-name)}</device-group>
             <ingress>
               <interface>
-                <name>{/ingress-interface}</name>
+                <name>{string(../ingress-interface)}</name>
               </interface>
             </ingress>
             <load-balance>
@@ -29,12 +29,12 @@
                 <method>src</method>
                 <ip/>
               </method>
-              <buckets>{/buckets}</buckets>
+              <buckets>{string(../buckets)}</buckets>
             </load-balance>
             <virtual>
               <ip>
-                <address>{/virtual-ip}</address>
-                <mask>{/virtual-ip-mask}</mask>
+                <address>{string(../virtual-ip)}</address>
+                <mask>{string(../virtual-ip-mask)}</mask>
                 <advertise>enable</advertise>
               </ip>
             </virtual>

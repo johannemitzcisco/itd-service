@@ -2,56 +2,91 @@ module intelligent-traffic-director {
   namespace "http://com/example/intelligenttrafficdirector";
   prefix itd;
 
-  import ietf-inet-types {
-    prefix inet;
-  }
-  import tailf-ncs {
-    prefix ncs;
+  import ietf-inet-types { prefix inet; }
+  import tailf-ncs { prefix ncs; }
+  import tailf-common { prefix tailf; }
+  import ftdv-ngfw { prefix ftdv; }
+
+  typedef side {
+    type enumeration {
+      enum "inside";
+      enum "outside";
+    }
   }
 
-  grouping itd-common-grouping {
+  grouping device-grouping {
+    list devices {
+      key device;
+      leaf device {
+        type leafref {
+          path "/ncs:devices/ncs:device/ncs:name";
+        }
+      }
+      leaf side {
+        type side;
+      }
+    }
+  }
+
+  grouping service-grouping {
+    leaf ingress-interface {
+      type string;
+    }
+    leaf virtual-ip {
+      type inet:ipv4-address;
+    }
+    leaf virtual-ip-mask {
+       type string;
+    }
+    leaf-list node-ip {
+      type inet:ipv4-address;
+    }
     leaf buckets {
       type uint16 {
           range 2..256;
       }
     }
   }
-  grouping itd-side-grouping {
-    leaf ingress-interface {
-      type string;
-    }
-
-    leaf virtual-ip {
-      type inet:ipv4-address;
-    }
-
-    leaf virtual-ip-mask {
-       type string;
-    }
-  }
 
   list intelligent_traffic_director {
-    key itd-service;
+    key service-name;
 
     uses ncs:service-data;
     ncs:servicepoint "intelligent-traffic-director";
 
-    leaf itd-service {
+    leaf service-name {
       type string;
     }
-    
-    leaf device {
-      type leafref {
-        path "/ncs:devices/ncs:device/ncs:name";
+    uses device-grouping;
+    list sides {
+      key side;
+      leaf side {
+        type side;
+      }
+      leaf-list devices {
+        type leafref {
+          path "../../devices/device";
+        }
+      }
+      uses service-grouping;
+    }
+  }
+
+  augment /ftdv:vnf-manager/ftdv:site {
+    container intelligent-traffic-director {
+      uses device-grouping;
+    }
+  }
+
+  augment /ftdv:vnf-manager/ftdv:site/ftdv:vnf-deployment/ftdv:scaling/ftdv:load-balance/ftdv:load-balancer {
+    container nexus-intelligent-traffic-director {
+      list sides {
+        key side;
+        leaf side {
+          type side;
+        }
+        uses service-grouping;
       }
     }
-
-    leaf-list node-ip {
-      type string;
-    }
-
-    uses itd-common-grouping;
-    uses itd-side-grouping;
-    
   }
 }
