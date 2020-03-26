@@ -6,6 +6,7 @@ module intelligent-traffic-director {
   import tailf-ncs { prefix ncs; }
   import tailf-common { prefix tailf; }
   import ftdv-ngfw { prefix ftdv; }
+//  import network { prefix network; }
 
   typedef side {
     type enumeration {
@@ -75,6 +76,12 @@ module intelligent-traffic-director {
   augment /ftdv:vnf-manager/ftdv:site {
     container intelligent-traffic-director {
       uses device-grouping;
+    }
+  }
+
+  augment /ftdv:vnf-manager/ftdv:site/ftdv:networks/ftdv:network {
+    leaf intelligent-traffic-director-side {
+      type side;
     }
   }
 
