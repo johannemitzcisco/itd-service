@@ -1,6 +1,6 @@
 <ncs-package xmlns="http://tail-f.com/ns/ncs-packages">
   <name>intelligent-traffic-director</name>
-  <package-version>1.0</package-version>
+  <package-version>2.0.1</package-version>
   <description>Template-based intelligent-traffic-director resource facing service</description>
   <ncs-min-version>4.7</ncs-min-version>
 
