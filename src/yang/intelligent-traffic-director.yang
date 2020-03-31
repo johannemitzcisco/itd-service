@@ -1,4 +1,5 @@
 module intelligent-traffic-director {
+
   namespace "http://com/example/intelligenttrafficdirector";
   prefix itd;
 
@@ -6,7 +7,6 @@ module intelligent-traffic-director {
   import tailf-ncs { prefix ncs; }
   import tailf-common { prefix tailf; }
   import ftdv-ngfw { prefix ftdv; }
-//  import network { prefix network; }
 
   typedef side {
     type enumeration {
@@ -86,7 +86,25 @@ module intelligent-traffic-director {
   }
 
   augment /ftdv:vnf-manager/ftdv:site/ftdv:vnf-deployment/ftdv:scaling/ftdv:load-balance/ftdv:load-balancer {
-    container nexus-intelligent-traffic-director {
+    container cisco-intelligent-traffic-director {
+      tailf:action initialize {
+        tailf:actionpoint initialize-itd-action;
+        input {}
+        output {
+          leaf result {
+            type string;
+          }
+        }
+      }
+      tailf:action deploy {
+        tailf:actionpoint configure-itd-action;
+        input {}
+        output {
+          leaf result {
+            type string;
+          }
+        }
+      }
       list sides {
         key side;
         leaf side {
@@ -97,3 +115,4 @@ module intelligent-traffic-director {
     }
   }
 }
+
