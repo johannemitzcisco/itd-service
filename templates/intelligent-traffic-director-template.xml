@@ -6,6 +6,10 @@
       <config>
         <feature xmlns="http://tail-f.com/ned/cisco-nx">
           <itd/>
+          <pbr/>
+          <sla>
+            <sender/>
+          </sla>
         </feature>
         <itd xmlns="http://tail-f.com/ned/cisco-nx">
           <device-group>
@@ -15,6 +19,10 @@
                 <address>{../node-ip}</address>
               </ip>
             </node>
+            <probe>
+              <protocol>icmp</protocol>
+              <frequency>5</frequency>
+            </probe>
           </device-group>
           <service>
             <name>{string(../../service-name)}</name>
@@ -26,18 +34,12 @@
             </ingress>
             <load-balance>
               <method>
-                <method>src</method>
+                <method>{string(../method)}</method>
                 <ip/>
               </method>
               <buckets>{string(../buckets)}</buckets>
             </load-balance>
-            <virtual>
-              <ip>
-                <address>{string(../virtual-ip)}</address>
-                <mask>{string(../virtual-ip-mask)}</mask>
-                <advertise>enable</advertise>
-              </ip>
-            </virtual>
+            <shut>false</shut>
           </service>
         </itd>
       </config>

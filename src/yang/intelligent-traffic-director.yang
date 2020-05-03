@@ -47,6 +47,12 @@ module intelligent-traffic-director {
           range 2..256;
       }
     }
+    leaf method {
+      type enumeration {
+        enum "src";
+        enum "dst";
+      }
+    }
   }
 
   list intelligent_traffic_director {
@@ -109,6 +115,11 @@ module intelligent-traffic-director {
         key side;
         leaf side {
           type side;
+        }
+        leaf site-network {
+          type leafref {
+            path "../../../../ftdv:networks/ftdv:network/ftdv:name";
+          }
         }
         uses service-grouping;
       }

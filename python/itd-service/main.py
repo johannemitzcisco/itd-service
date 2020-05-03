@@ -14,6 +14,17 @@ class ConfigureITD(Action):
             lb = ncs.maagic.get_node(trans, kp)
             service = lb._parent._parent._parent
             site = service._parent._parent
+            outside_network = None
+            inside_network = None
+            for network in site.networks.network:
+                if network.intelligent_traffic_director_side == 'inside':
+                    inside_network = network
+                elif network.intelligent_traffic_director_side == 'outside':
+                    outside_network = network
+            if outside_network is None:
+                raise Exception('Outside network at of the site must be identified')
+            if inside_network is None:
+                raise Exception('Inside network at of the site must be identified')
             self.log.info('Configuring ITD: '+service.deployment_name)
             run_root = ncs.maagic.get_root(trans)
             for service_device in service.device:
@@ -21,16 +32,18 @@ class ConfigureITD(Action):
                     for nexus_device in site.intelligent_traffic_director.devices:
                         if nexus_device.side == side.side:
                             vars = ncs.template.Variables()
-                            vars.add('SERVICE-NAME', service.deployment_name)
+                            vars.add('SERVICE-NAME', service.tenant+'-'+service.deployment_name)
                             vars.add('DEVICE-NAME', nexus_device.device)
                             vars.add('SIDE', side.side)
                             vars.add('INGRESS-INTERFACE-NAME', side.ingress_interface)
                             vars.add('SERVICE-IP-ADDRESS', side.virtual_ip)
                             vars.add('SERVICE-IP-MASK', side.virtual_ip_mask)
                             if side.side == 'inside':
-                                address = service_device.inside_ip_address
+                                address = service_device.networks.network[side.site_network].ip_address
+                                vars.add('METHOD', 'dst');
                             else:
-                                address = service_device.outside_ip_address
+                                address = service_device.networks.network[side.site_network].ip_address
+                                vars.add('METHOD', 'src');
                             vars.add('NODE-IP', address)
                             vars.add('SERVICE-BUCKET-COUNT', side.buckets);
                             template = ncs.template.Template(service)

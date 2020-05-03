@@ -12,5 +12,6 @@
     <virtual-ip-mask>{$SERVICE-IP-MASK}</virtual-ip-mask>
     <node-ip>{$NODE-IP}</node-ip>
     <buckets>{$SERVICE-BUCKET-COUNT}</buckets>
+    <method>{$METHOD}</method>
   </sides>
 </intelligent_traffic_director>
