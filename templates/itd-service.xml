@@ -8,8 +8,8 @@
     <side>{$SIDE}</side>
     <devices>{$DEVICE-NAME}</devices>
     <ingress-interface>{$INGRESS-INTERFACE-NAME}</ingress-interface>
-    <virtual-ip>{$SERVICE-IP-ADDRESS}</virtual-ip>
-    <virtual-ip-mask>{$SERVICE-IP-MASK}</virtual-ip-mask>
+    <!-- virtual-ip>{$SERVICE-IP-ADDRESS}</virtual-ip>
+    <virtual-ip-mask>{$SERVICE-IP-MASK}</virtual-ip-mask -->
     <node-ip>{$NODE-IP}</node-ip>
     <buckets>{$SERVICE-BUCKET-COUNT}</buckets>
     <method>{$METHOD}</method>
