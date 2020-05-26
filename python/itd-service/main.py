@@ -3,6 +3,25 @@ import ncs
 from ncs.dp import Action
 import traceback
 
+class AddLoadBalancedDevice(Action):
+    @Action.action
+    def cb_action(self, uinfo, name, kp, input, output):
+        self.log.info('action name: ', name, ' ', uinfo.actx_thandle, ' ', uinfo.username, ' ', uinfo.context)
+        try:
+            maapi = ncs.maapi.Maapi()
+            maapi.attach2(0, 0, uinfo.actx_thandle)
+            trans = ncs.maapi.Transaction(maapi, uinfo.actx_thandle)
+            device = ncs.maagic.get_node(trans, kp)
+            if input.enable == True:
+                if not device.load_balanced.exists():
+                    self.log.info("Marking device for load balancing", device.name)
+                    device.load_balanced.create()
+            elif device.load_balanced.exists():
+                del device.load_balanced
+        except Exception as e:
+            self.log.error(e)
+            self.log.error(traceback.format_exc())
+
 class ConfigureITD(Action):
     @Action.action
     def cb_action(self, uinfo, name, kp, input, output):
@@ -28,27 +47,28 @@ class ConfigureITD(Action):
             self.log.info('Configuring ITD: '+service.deployment_name)
             run_root = ncs.maagic.get_root(trans)
             for service_device in service.device:
-                for side in service.scaling.load_balance.cisco_intelligent_traffic_director.sides:
-                    for nexus_device in site.intelligent_traffic_director.devices:
-                        if nexus_device.side == side.side:
-                            vars = ncs.template.Variables()
-                            vars.add('SERVICE-NAME', service.tenant+'-'+service.deployment_name)
-                            vars.add('DEVICE-NAME', nexus_device.device)
-                            vars.add('SIDE', side.side)
-                            vars.add('INGRESS-INTERFACE-NAME', side.ingress_interface)
-                            vars.add('SERVICE-IP-ADDRESS', side.virtual_ip)
-                            vars.add('SERVICE-IP-MASK', side.virtual_ip_mask)
-                            if side.side == 'inside':
-                                address = service_device.networks.network[side.site_network].ip_address
-                                vars.add('METHOD', 'dst');
-                            else:
-                                address = service_device.networks.network[side.site_network].ip_address
-                                vars.add('METHOD', 'src');
-                            vars.add('NODE-IP', address)
-                            vars.add('SERVICE-BUCKET-COUNT', side.buckets);
-                            template = ncs.template.Template(service)
-                            template.apply('itd-service', vars)
-                            self.log.info("ITD Add: {} {} {} {}".format(nexus_device.device, service_device.name, side.side, address))
+                if service_device.load_balanced.exists():
+                    for side in service.scaling.load_balance.cisco_intelligent_traffic_director.sides:
+                        for nexus_device in site.intelligent_traffic_director.devices:
+                            if nexus_device.side == side.side:
+                                vars = ncs.template.Variables()
+                                vars.add('SERVICE-NAME', service.tenant+'-'+service.deployment_name)
+                                vars.add('DEVICE-NAME', nexus_device.device)
+                                vars.add('SIDE', side.side)
+                                vars.add('INGRESS-INTERFACE-NAME', side.ingress_interface)
+                                vars.add('SERVICE-IP-ADDRESS', side.virtual_ip)
+                                vars.add('SERVICE-IP-MASK', side.virtual_ip_mask)
+                                if side.side == 'inside':
+                                    address = service_device.networks.network[side.site_network].ip_address
+                                    vars.add('METHOD', 'dst');
+                                else:
+                                    address = service_device.networks.network[side.site_network].ip_address
+                                    vars.add('METHOD', 'src');
+                                vars.add('NODE-IP', address)
+                                vars.add('SERVICE-BUCKET-COUNT', side.buckets);
+                                template = ncs.template.Template(service)
+                                template.apply('itd-service', vars)
+                                self.log.info("ITD Add: {} {} {} {}".format(nexus_device.device, service_device.name, side.side, address))
                 service.scaling.load_balance.status = 'Enabled'
                 result =  "ITD Enabled"
                 self.log.info("ITD Configured!")
@@ -104,4 +124,5 @@ class Main(ncs.application.Application):
         self.log.info('Main RUNNING')
         self.register_action('configure-itd-action', ConfigureITD)
         self.register_action('initialize-itd-action', Initialize)
+        self.register_action('add-load-balanced-device', AddLoadBalancedDevice)
 

@@ -91,6 +91,20 @@ module intelligent-traffic-director {
     }
   }
 
+  augment /ftdv:vnf-manager/ftdv:site/ftdv:vnf-deployment/ftdv:device {
+    container load-balanced {
+      presence "true";
+    }
+    tailf:action load-balance {
+      tailf:actionpoint add-load-balanced-device;
+      input {
+        leaf enable {
+          type boolean;
+        }
+      }
+      output {}
+    }
+  }
   augment /ftdv:vnf-manager/ftdv:site/ftdv:vnf-deployment/ftdv:scaling/ftdv:load-balance/ftdv:load-balancer {
     container cisco-intelligent-traffic-director {
       tailf:action initialize {
@@ -118,7 +132,7 @@ module intelligent-traffic-director {
         }
         leaf site-network {
           type leafref {
-            path "../../../../ftdv:networks/ftdv:network/ftdv:name";
+            path "../../../../../ftdv:networks/ftdv:network/ftdv:name";
           }
         }
         uses service-grouping;
